@@ -1,10 +1,10 @@
 """Support for testing."""
 
 from django.test import TestCase
-#from unittest import TestCase
+# from unittest import TestCase
 
 
-#class DatabaselessTestRunner(TestCase):
+# class DatabaselessTestRunner(TestCase):
 class AnimalTestCase(TestCase):
     """A test suite runner that does not set up and tear down a database."""
 
