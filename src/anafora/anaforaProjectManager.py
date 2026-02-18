@@ -1,8 +1,8 @@
 #!/usr/bin/python2.7
 import os
 import glob
-from projectSetting import *
-from taskFile import TaskFile
+from .projectSetting import *
+from .taskFile import TaskFile
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from subprocess import check_output
@@ -10,7 +10,7 @@ import re
 
 
 class AnaforaProjectManager:
-    # rootPath = ""
+    rootPath = ""
     projectList = {}
     hasLoadProject = False
     annotatorRE = re.compile(r"^.*\/?[^\/]+\.[^\/\.]+\.([^\/\.]+)\.([^\/\.]+)\.xml")

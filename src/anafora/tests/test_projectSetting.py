@@ -1,10 +1,12 @@
 #!/usr/bin/env python
+import operator
 import os
+from functools import reduce
 
 # from unittest import TestCase
-from unittest2 import TestCase
+from unittest import TestCase
 from django.conf import settings
-from projectSetting import Schema, Mode, Project, ProjectSetting
+from ..projectSetting import Schema, Mode, Project, ProjectSetting
 from django.core.exceptions import ImproperlyConfigured
 from xml.dom.minidom import parseString
 
@@ -245,8 +247,8 @@ class ProjectSettingTests(TestCase):
         self.assertEqual(len(project0.allowedSchemas), 4)
         self.assertTrue(
             reduce(
-                lambda x, y: x and y,
-                [isinstance(schema, Schema) for schema in project0.allowedSchemas],
+                operator.__and__,
+                (isinstance(schema, Schema) for schema in project0.allowedSchemas),
             )
         )
         self.assertEqual(project0.numOfAnnotator, 2)

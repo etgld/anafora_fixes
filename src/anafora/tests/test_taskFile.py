@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from unittest import TestCase
 
-from taskFile import *
+from ..taskFile import TaskFile, ValidationError
 
 
 class TaskFileTest(TestCase):

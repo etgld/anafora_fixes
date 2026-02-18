@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-
+from functools import reduce
 from django.core.exceptions import ValidationError
 
 

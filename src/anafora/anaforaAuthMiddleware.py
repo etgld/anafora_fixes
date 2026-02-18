@@ -29,17 +29,18 @@ class AnaforaAuthMiddleware(object):
             try:
                 groupFile = settings.GROUP_FILE
                 if AnaforaAuthMiddleware.groupList == None:
-                    fhd = open(groupFile)
-                    for line in fhd.xreadlines():
-                        term = line.split(":")
-                        if term[0].strip() == settings.ADMIN_GROUPNAME:
-                            AnaforaAuthMiddleware.groupList = [
-                                t.strip() for t in term[1].split(" ") if t.strip() != ""
-                            ]
-                            break
-                    fhd.close()
+                    with open(groupFile) as fhd:
+                        for line in fhd.readlines():
+                            term = line.split(":")
+                            if term[0].strip() == settings.ADMIN_GROUPNAME:
+                                AnaforaAuthMiddleware.groupList = [
+                                    t.strip()
+                                    for t in term[1].split(" ")
+                                    if t.strip() != ""
+                                ]
+                                break
             except:
-                raise
+                raise Exception(f"Error parsing groupFile {groupFile}")
 
             if (
                 AnaforaAuthMiddleware.groupList != None

@@ -1,7 +1,7 @@
 #!/usr/bin/python2.7
 import sys
 import os
-
+from functools import reduce
 from xml.dom.minidom import parseString
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -22,7 +22,7 @@ class ProjectSetting(object):
         """
         try:
             with open(filePath) as fhd:
-                psXMLStr = reduce(lambda x, y: x + " " + y, fhd.xreadlines())
+                psXMLStr = reduce(lambda x, y: x + " " + y, fhd.readlines())
         except IOError:
             raise ImproperlyConfigured(
                 "Can not find setting file '%s', please check your setting of ``ANAFORA_PROJECT_FILE_ROOT'' and ``ANAFORA_PROJECT_SETTING_FILENAME'' in your setting file"

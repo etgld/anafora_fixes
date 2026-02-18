@@ -1,8 +1,8 @@
 # from django.test import TestCase
 from unittest import TestCase
 from django.test.client import RequestFactory
-from django.core.urlresolvers import resolve
-import views
+from django.urls import resolve
+from ..views import index, selectProject, selectCorpus, annotateNormal
 import re
 import json
 
@@ -34,16 +34,20 @@ class AnnotateTests(TestCase):
         @type settingDict:  dict
         """
         jsStr = re.search(AnnotateTests.jsPattern, contentStr)
-        self.assertNotEqual(jsStr, None)
+        if jsStr is None:
+            raise ValueError(
+                f"Cannot find instance of {AnnotateTests.jsPattern} in {contentStr}"
+            )
 
         jsReplStr = re.sub(AnnotateTests.jsPropertyRepl, r'"\1" :', jsStr.group(1))
         tOutputDict = json.loads(jsReplStr)
         outputDict = {}
         for tKey in tOutputDict:
-            if isinstance(tOutputDict[tKey], unicode):
-                outputDict[str(tKey)] = str(tOutputDict[tKey])
-            else:
-                outputDict[str(tKey)] = tOutputDict[tKey]
+            # if isinstance(tOutputDict[tKey], unicode):
+            #     outputDict[str(tKey)] = str(tOutputDict[tKey])
+            # else:
+            # In Python 3, it's all unicode
+            outputDict[str(tKey)] = tOutputDict[tKey]
         self.assertTrue(isinstance(outputDict, dict))
         self.assertTrue(isinstance(settingDict, dict))
 
@@ -58,7 +62,7 @@ class AnnotateTests(TestCase):
 
         request = self.factory.get("/annotate/")
         request.META["REMOTE_USER"] = "guest"
-        response = views.index(request)
+        response = index(request)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.charset, "utf-8")
 
@@ -77,7 +81,7 @@ class AnnotateTests(TestCase):
 
         request = self.factory.get("/annotate/SampleProject/")
         request.META["REMOTE_USER"] = "guest"
-        response = views.selectProject(request, "SampleProject")
+        response = selectProject(request, "SampleProject")
         self.assertEqual(response.status_code, 403)
         self.assertEqual(response.charset, "utf-8")
         self.assertEqual(
@@ -86,7 +90,7 @@ class AnnotateTests(TestCase):
 
         request = self.factory.get("/annotate/Temporal/")
         request.META["REMOTE_USER"] = "guest"
-        response = views.selectProject(request, "Temporal")
+        response = selectProject(request, "Temporal")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.charset, "utf-8")
         settingVar = dict(AnnotateTests.basicSettingDict)
@@ -109,7 +113,7 @@ class AnnotateTests(TestCase):
 
         request = self.factory.get("/annotate/fakeProject/fakeCorpus")
         request.META["REMOTE_USER"] = "guest"
-        response = views.selectCorpus(request, "fakeProject", "fakeCorpus")
+        response = selectCorpus(request, "fakeProject", "fakeCorpus")
         self.assertEqual(response.status_code, 403)
         self.assertEqual(response.charset, "utf-8")
         self.assertEqual(
@@ -118,14 +122,14 @@ class AnnotateTests(TestCase):
 
         request = self.factory.get("/annotate/Temporal/fakeCorpus")
         request.META["REMOTE_USER"] = "guest"
-        response = views.selectCorpus(request, "Temporal", "fakeCorpus")
+        response = selectCorpus(request, "Temporal", "fakeCorpus")
         self.assertEqual(response.status_code, 403)
         self.assertEqual(response.charset, "utf-8")
         self.assertEqual(response.content, "Corpus Name: 'fakeCorpus' does not exists")
 
         request = self.factory.get("/annotate/Temporal/ColonCancer/")
         request.META["REMOTE_USER"] = "guest"
-        response = views.selectCorpus(request, "Temporal", "ColonCancer")
+        response = selectCorpus(request, "Temporal", "ColonCancer")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.charset, "utf-8")
         settingVar = dict(AnnotateTests.basicSettingDict)
@@ -147,7 +151,7 @@ class AnnotateTests(TestCase):
 
         request = self.factory.get("/annotate/Temporal/ColonCancer/ID063_clinic_185/")
         request.META["REMOTE_USER"] = "guest"
-        response = views.annotateNormal(
+        response = annotateNormal(
             request,
             projectName="Temporal",
             corpusName="ColonCancer",

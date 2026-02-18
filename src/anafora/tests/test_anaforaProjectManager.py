@@ -2,8 +2,8 @@
 import os
 from unittest import TestCase
 from django.conf import settings
-from anaforaProjectManager import AnaforaProjectManager
-from projectSetting import ProjectSetting
+from ..anaforaProjectManager import AnaforaProjectManager
+from ..projectSetting import ProjectSetting
 
 
 class AnaforaProjectManagerTest(TestCase):

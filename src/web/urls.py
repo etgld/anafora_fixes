@@ -1,4 +1,4 @@
-from django.conf.urls import include, url
+from django.urls import include, re_path
 from django.conf import settings
 import anafora.views
 from django.conf.urls.static import static
@@ -12,10 +12,10 @@ from django.conf.urls.static import static
 # admin.autodiscover()
 
 urlpatterns = [
-    url(r"^annotate/", include("anafora.urls")),
-    url(r"^anafora/", include("anafora.urls")),
-    url(r"^anaforaTest/", include("anaforaTest.urls")),
-    url(r"^$", anafora.views.index),
+    re_path(r"^annotate/", include("anafora.urls")),
+    re_path(r"^anafora/", include("anafora.urls")),
+    re_path(r"^anaforaTest/", include("anaforaTest.urls")),
+    re_path(r"^$", anafora.views.index),
     #    url(r'^' + settings.STATIC_URL + '(?P<path>.*)$','django.views.static.serve', {'document_root': settings.STATIC_ROOT}  ),
     # Examples:
     # url(r'^$', 'web.views.home', name='home'),

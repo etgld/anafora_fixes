@@ -4,7 +4,7 @@ from django.test import SimpleTestCase
 # import unittest2
 from django.test.client import Client
 from django.test.client import RequestFactory
-from django.core.urlresolvers import resolve
+from django.urls import resolve
 
 # import views
 import json
