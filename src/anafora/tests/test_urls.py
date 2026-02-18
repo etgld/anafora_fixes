@@ -1,13 +1,10 @@
 #!/usr/bin/env python
-import os
-from unittest import TestCase
-from django.test import TestCase, SimpleTestCase
+from django.test import SimpleTestCase
 
 # import unittest2
 from django.test.client import Client
 from django.test.client import RequestFactory
 from django.core.urlresolvers import resolve
-import anafora.views
 
 # import views
 import json

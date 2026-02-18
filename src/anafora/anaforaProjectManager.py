@@ -1,11 +1,11 @@
 #!/usr/bin/python2.7
-import os, sys
+import os
 import glob
 from projectSetting import *
 from taskFile import TaskFile
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from subprocess import call, check_output
+from subprocess import check_output
 import re
 
 

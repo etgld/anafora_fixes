@@ -1,10 +1,10 @@
 #!/usr/bin/python2.7
-import sys, os
+import sys
+import os
 
-from xml.dom.minidom import parseString, Element
+from xml.dom.minidom import parseString
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-import itertools
 
 
 class ProjectSetting(object):
@@ -23,7 +23,7 @@ class ProjectSetting(object):
         try:
             with open(filePath) as fhd:
                 psXMLStr = reduce(lambda x, y: x + " " + y, fhd.xreadlines())
-        except IOError as e:
+        except IOError:
             raise ImproperlyConfigured(
                 "Can not find setting file '%s', please check your setting of ``ANAFORA_PROJECT_FILE_ROOT'' and ``ANAFORA_PROJECT_SETTING_FILENAME'' in your setting file"
                 % (filePath)

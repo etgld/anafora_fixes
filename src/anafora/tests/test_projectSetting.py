@@ -7,7 +7,6 @@ from django.conf import settings
 from projectSetting import Schema, Mode, Project, ProjectSetting
 from django.core.exceptions import ImproperlyConfigured
 from xml.dom.minidom import parseString
-from xml import dom
 
 
 class ModeTests(TestCase):

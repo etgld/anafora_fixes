@@ -6,7 +6,6 @@ from django.views.decorators.csrf import csrf_protect
 
 # from django.utils.encoding import smart_unicode, smart_str
 # import codecs
-import json
 # import os, sys
 # import grp
 # import pwd
@@ -28,7 +27,7 @@ def index(request, testFuncName=None):
     contextContent["js_lib"] = ["jquery.min.js", "qunit/qunit-2.5.0.js"]
     contextContent["css"] = ["qunit/qunit-2.5.0.css"]
 
-    if testFuncName == "testStableMarriage" or testFuncName == None:
+    if testFuncName == "testStableMarriage" or testFuncName is None:
         for jsFile in [
             "schema.js",
             "anaforaProject.js",
@@ -43,7 +42,7 @@ def index(request, testFuncName=None):
             if jsTestFile not in contextContent["js_test"]:
                 contextContent["js_test"].append(jsTestFile)
 
-    if testFuncName == "testAdjudication" or testFuncName == None:
+    if testFuncName == "testAdjudication" or testFuncName is None:
         for jsFile in [
             "schema.js",
             "anaforaProject.js",
@@ -58,7 +57,7 @@ def index(request, testFuncName=None):
             if jsTestFile not in contextContent["js_test"]:
                 contextContent["js_test"].append(jsTestFile)
 
-    if testFuncName == "testAnnotateFrame":  # or testFuncName == None:
+    if testFuncName == "testAnnotateFrame":  # or testFuncName is None:
         for jsFile in [
             "schema.js",
             "anaforaProject.js",

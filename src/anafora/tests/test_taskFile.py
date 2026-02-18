@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-import os
 from unittest import TestCase
 
 from taskFile import *

@@ -1,18 +1,15 @@
 # Create your views here.
-from django.template import Context, loader
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseForbidden
 from django.shortcuts import render
 from django.conf import settings
 from django.views.decorators.csrf import csrf_protect
-from django.utils.encoding import smart_unicode, smart_str
 import codecs
 from anaforaProjectManager import *
 from projectSetting import *
 import subprocess
 import json
-import os, sys
+import os
 import grp
-import pwd
 from django.core.cache import cache
 import traceback
 
@@ -115,7 +112,9 @@ def assignSettingVars(
 
     rSettings = {
         "app_name": "anafora",
-        "annotator": annotator if annotator != None else request.META["REMOTE_USER"],
+        "annotator": annotator
+        if annotator is not None
+        else request.META["REMOTE_USER"],
         "remoteUser": request.META["REMOTE_USER"],
         "schemaMap": json.dumps(ps.getSchemaMap()),
         "isAdjudication": isAdj,
@@ -123,16 +122,16 @@ def assignSettingVars(
         "isLogging": isLogging,
     }
 
-    if projectName != None:
+    if projectName is not None:
         rSettings["projectName"] = projectName
 
-    if corpusName != None:
+    if corpusName is not None:
         rSettings["corpusName"] = corpusName
 
-    if taskName != None:
+    if taskName is not None:
         rSettings["taskName"] = taskName
 
-    if schemaName != None:
+    if schemaName is not None:
         rSettings["schema"] = schemaName
 
     return rSettings
@@ -231,7 +230,7 @@ def index(request):
 
     ps = getProjectSetting()
     authResponse = authenticate(ps, request)
-    if authResponse != None:
+    if authResponse is not None:
         return authResponse
 
     contextContent = basicContextContent
@@ -247,7 +246,7 @@ def selectProject(request, projectName):
         return HttpResponseForbidden()
     ps = getProjectSetting()
     authResponse = authenticate(ps, request, projectName=projectName)
-    if authResponse != None:
+    if authResponse is not None:
         return authResponse
 
     contextContent = basicContextContent
@@ -270,7 +269,7 @@ def selectCorpus(request, projectName, corpusName):
     authResponse = authenticate(
         ps, request, projectName=projectName, corpusName=corpusName
     )
-    if authResponse != None:
+    if authResponse is not None:
         return authResponse
 
     contextContent = basicContextContent
@@ -331,7 +330,7 @@ def annotateNormal(
         isView=isView,
         isCrossDoc=isCrossDoc,
     )
-    if authResponse != None:
+    if authResponse is not None:
         return authResponse
 
     ps = getProjectSetting()
@@ -396,7 +395,7 @@ def annotateNormal(
             return HttpResponseForbidden("raw text file open error: " + rawTextFile)
 
     schemaMap = ps.getSchemaMap()
-    if annotator == None or annotator == "":
+    if annotator is None or annotator == "":
         annotator = account
     # else:
     #       if ";" not in annotatorName:
@@ -420,7 +419,7 @@ def annotateNormal(
             "corpusName": corpusName,
             "taskName": taskName,
             "schema": "%s%s"
-            % (schema, "" if schemaMode == None else (".%s" % schemaMode)),
+            % (schema, "" if schemaMode is None else (".%s" % schemaMode)),
             "isAdjudication": isAdjudication,
             "annotator": annotator,
             "remoteUser": request.META["REMOTE_USER"],
@@ -539,7 +538,7 @@ def getAnaforaXMLFile(
     anaforaXMLFile = os.path.join(
         settings.ANAFORA_PROJECT_FILE_ROOT, projectName, corpusName, taskName
     )
-    if subTaskName == None:
+    if subTaskName is None:
         anaforaXMLFile = os.path.join(
             anaforaXMLFile,
             "%s.%s.%s"
@@ -548,8 +547,8 @@ def getAnaforaXMLFile(
                 reduce(
                     lambda a, b: "%s-%s" % (a, b),
                     (schemaName,)
-                    + ((schemaMode,) if schemaMode != None else ())
-                    + (("Adjudication",) if isAdj != None else ()),
+                    + ((schemaMode,) if schemaMode is not None else ())
+                    + (("Adjudication",) if isAdj is not None else ()),
                 ),
                 account,
             ),
@@ -564,8 +563,8 @@ def getAnaforaXMLFile(
                 reduce(
                     lambda a, b: "%s-%s" % (a, b),
                     (schemaName,)
-                    + ((schemaMode,) if schemaMode != None else ())
-                    + (("Adjudication",) if isAdj != None else ()),
+                    + ((schemaMode,) if schemaMode is not None else ())
+                    + (("Adjudication",) if isAdj is not None else ()),
                 ),
                 account,
             ),
@@ -675,7 +674,7 @@ def getCrossTaskFromProjectCorpusName(
             schemaName,
             modeName,
         )
-    except Exception as e:
+    except Exception:
         errorStr = traceback.format_exc()
         return HttpResponseNotFound(errorStr)
 
@@ -804,7 +803,7 @@ def getTaskFromProjectCorpusName(
                 schemaName,
                 schemaMode,
             )
-    except Exception as e:
+    except Exception:
         errorStr = traceback.format_exc()
         return HttpResponseNotFound(errorStr)
         # return HttpResponseNotFound(str(e))
@@ -835,8 +834,8 @@ def writeFile(
         % (
             taskName,
             schemaName,
-            "" if schemaMode == None else "-%s" % schemaMode,
-            "" if isAdj == None else "-Adjudication",
+            "" if schemaMode is None else "-%s" % schemaMode,
+            "" if isAdj is None else "-Adjudication",
             (request.META["REMOTE_USER"]),
         ),
     )
@@ -848,7 +847,7 @@ def writeFile(
     with codecs.open(fileName, "w+", "utf-8") as fhd:
         fhd.write(fileContent)
 
-    if isAdj != None and ".completed.xml" in fileName:
+    if isAdj is not None and ".completed.xml" in fileName:
         fileNameGold = fileName.replace("-Adjudication", "").replace(
             "." + request.META["REMOTE_USER"] + ".", ".gold."
         )
@@ -896,8 +895,8 @@ def saveLogging(
         % (
             taskName,
             schemaName,
-            "" if schemaMode == None else "-%s" % schemaMode,
-            "" if isAdj == None else "-Adjudication",
+            "" if schemaMode is None else "-%s" % schemaMode,
+            "" if isAdj is None else "-Adjudication",
             (request.META["REMOTE_USER"]),
         ),
     )
@@ -914,14 +913,14 @@ def setCompleted(
     if request.method != "POST":
         return HttpResponseForbidden()
 
-    if isSchemaExist(schemaName, schemaMode) != True:
+    if not isSchemaExist(schemaName, schemaMode):
         return HttpResponseNotFound("schema file not found")
 
     filePath = os.path.join(
         settings.ANAFORA_PROJECT_FILE_ROOT, projectName, corpusName, taskName
     )
 
-    if os.path.exists(filePath) != True:
+    if not os.path.exists(filePath):
         return HttpResponseNotFound("project, corpus or task not found")
 
     fileName = os.path.join(
@@ -930,8 +929,8 @@ def setCompleted(
         % (
             taskName,
             schemaName,
-            "" if schemaMode == None else "-%s" % schemaMode,
-            "" if isAdj == None else "-Adjudication",
+            "" if schemaMode is None else "-%s" % schemaMode,
+            "" if isAdj is None else "-Adjudication",
             request.META["REMOTE_USER"],
         ),
     )
@@ -966,7 +965,7 @@ def setCompleted(
                 + taskName
                 + "."
                 + schemaName
-                + ("" if schemaMode == None else ("-" + schemaMode))
+                + ("" if schemaMode is None else ("-" + schemaMode))
                 + ".gold.completed.xml"
             )
             subprocess.call(["cp", fileName + ".completed.xml", fileNameGold])
@@ -1028,16 +1027,16 @@ def getProjectSetting():
     @rtype: ProjectSetting
     """
     global projectSetting
-    if projectSetting != None:
+    if projectSetting is not None:
         return projectSetting
 
     projectSetting = cache.get("anafora_project_setting")
-    if projectSetting == None:
+    if projectSetting is None:
         parseFile = os.path.join(
             settings.ANAFORA_PROJECT_FILE_ROOT,
             settings.ANAFORA_PROJECT_SETTING_FILENAME,
         )
-        if os.path.isfile(parseFile) != True:
+        if not os.path.isfile(parseFile):
             from django.core.exceptions import ImproperlyConfigured
 
             raise ImproperlyConfigured(
