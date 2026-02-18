@@ -1,7 +1,6 @@
 #!/usr/bin/python2.7
 import os
 import glob
-from .projectSetting import *
 from .taskFile import TaskFile
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -42,7 +41,7 @@ class AnaforaProjectManager:
         """Load projectName into projectList
         @type ps		ProjectSetting
         """
-        if AnaforaProjectManager.hasLoadProject == False:
+        if not AnaforaProjectManager.hasLoadProject:
             AnaforaProjectManager.projectList = dict(
                 [(str(projectName), None) for projectName in ps.projectList.keys()]
             )
@@ -55,7 +54,7 @@ class AnaforaProjectManager:
         @type projectName:  str
         """
         AnaforaProjectManager.checkExist(ps, projectName=projectName)
-        if AnaforaProjectManager.projectList[projectName] == None:
+        if AnaforaProjectManager.projectList[projectName] is None:
             projectPath = os.path.join(settings.ANAFORA_PROJECT_FILE_ROOT, projectName)
             AnaforaProjectManager.projectList[projectName] = sorted(
                 [
@@ -77,7 +76,7 @@ class AnaforaProjectManager:
         @type modeName:		str
         @rtype:bool
         """
-        if AnaforaProjectManager.hasLoadProject == False:
+        if not AnaforaProjectManager.hasLoadProject:
             AnaforaProjectManager.loadProject(ps)
 
         if projectName not in AnaforaProjectManager.projectList:
@@ -86,7 +85,7 @@ class AnaforaProjectManager:
         if corpusName == "":
             return True
 
-        if AnaforaProjectManager.projectList[projectName] == None:
+        if AnaforaProjectManager.projectList[projectName] is None:
             AnaforaProjectManager.loadCorpus(ps, projectName)
 
         if corpusName not in AnaforaProjectManager.projectList[projectName]:
@@ -98,16 +97,13 @@ class AnaforaProjectManager:
         if taskName == "":
             return True
 
-        if (
-            os.path.isdir(
-                os.path.join(
-                    settings.ANAFORA_PROJECT_FILE_ROOT,
-                    projectName,
-                    corpusName,
-                    taskName,
-                )
+        if not os.path.isdir(
+            os.path.join(
+                settings.ANAFORA_PROJECT_FILE_ROOT,
+                projectName,
+                corpusName,
+                taskName,
             )
-            != True
         ):
             raise Exception(
                 "Task '%s' is not exist under Project '%s' - Corpus '%s'"
@@ -278,7 +274,7 @@ class AnaforaProjectManager:
                             hasPreannotation = True
                             break
 
-                    if hasPreannotation != True:
+                    if not hasPreannotation:
                         allHasPreannotation = False
                         break
 
@@ -322,7 +318,7 @@ class AnaforaProjectManager:
             settings.ANAFORA_PROJECT_FILE_ROOT, projectName, corpusName
         )
 
-        if needPreannotation == None:
+        if needPreannotation is None:
             needPreannotation = False
             if mode.needPreannotation:
                 # if("Relation" in schemaName):
@@ -357,10 +353,7 @@ class AnaforaProjectManager:
                     # if "%s.%s.%s" % (taskName, annotator, mode.getSchemaName()) in projectXMLFileName:
                     # if "." + annotator + "." in projectXMLFileName and taskName + '.' + schemaName + "." in projectXMLFileName:
                     # data file for annotator is exists
-                    if (
-                        taskFile.annotator == annotator
-                        and taskFile.isAdjudication == False
-                    ):
+                    if taskFile.annotator == annotator and not taskFile.isAdjudication:
                         if ".completed.xml" in projectXMLFileName:
                             # if taskFile.isCompleted:
                             completedTask.append(taskName)
@@ -383,12 +376,12 @@ class AnaforaProjectManager:
                     or (numOfAnnotatorFile > 0 and annotator == "gold")
                     or (os.path.exists(os.path.join(taskPath, ".nolimit")))
                 )
-                and (needPreannotation != True or hasPreannotation)
-                and (hasGold != True)
-                and (hasAdjudication != True)
+                and (not needPreannotation or hasPreannotation)
+                and not hasGold
+                and not hasAdjudication
                 and taskName not in completedTask
                 and taskName not in inProgressTask
-                and os.path.exists(os.path.join(taskPath, ".noassign")) != True
+                and not os.path.exists(os.path.join(taskPath, ".noassign"))
             ):
                 newTask.append(taskName)
 
@@ -426,7 +419,7 @@ class AnaforaProjectManager:
         # schemaName = schemaName.replace(".", "-")
         # schemaName = schemaName.replace("-Adjudication", "")
 
-        mode = ps.getMode(schemaName, modeName)
+        # mode = ps.getMode(schemaName, modeName)
         corpusPath = os.path.join(
             settings.ANAFORA_PROJECT_FILE_ROOT, projectName, corpusName
         )
@@ -435,7 +428,7 @@ class AnaforaProjectManager:
             # for taskName in [tName for tName in os.listdir(corpusPath) if os.path.isdir(os.path.join(corpusPath, tName)) and tName[0] != '.']:
             taskPath = os.path.join(corpusPath, taskName)
             numOfAnnotatorFile = 0
-            hasPreannotation = False
+            # hasPreannotation = False
             hasOtherAdjudicator = False
             hasGold = False
             for projectXMLFileName in [
@@ -466,20 +459,20 @@ class AnaforaProjectManager:
                     else:
                         if taskFile.isGold:
                             hasGold = True
-                        elif taskFile.isPreannotation:
-                            hasPreannotation = True
+                        # elif taskFile.isPreannotation:
+                        #     hasPreannotation = True
                         elif taskFile.isCompleted:
                             numOfAnnotatorFile += 1
 
             if (
                 numOfAnnotatorFile >= maxNumOfAnnotator
                 and (
-                    hasOtherAdjudicator == False
+                    not hasOtherAdjudicator
                     or os.path.exists(os.path.join(taskPath, ".nolimit"))
                 )
                 and taskName not in completedTask
                 and taskName not in inProgressTask
-                and (hasGold != True)
+                and not hasGold
             ):
                 newTask.append(taskName)
 
@@ -582,7 +575,7 @@ class AnaforaProjectManager:
                     re.search(AnaforaProjectManager.annotatorRE, term)
                     for term in fileList
                 ]
-                if annotatorMatcher != None
+                if annotatorMatcher is not None
             ]
         )
         # return sorted([term.split("/")[-1].split(".")[-3] for term in fileList])
@@ -611,9 +604,9 @@ class AnaforaProjectManager:
         AnaforaProjectManager.checkExist(ps, projectName, corpusName, taskName)
         mode = ps.getMode(schemaName, schemaMode)
 
-        path = os.path.join(
-            settings.ANAFORA_PROJECT_FILE_ROOT, projectName, corpusName, taskName
-        )
+        # path = os.path.join(
+        #     settings.ANAFORA_PROJECT_FILE_ROOT, projectName, corpusName, taskName
+        # )
         # fileList = glob.glob(path + "/" + taskName + '.' + schemaName + ".*.completed.xml")
         fileList = glob.glob(
             os.path.join(
@@ -636,6 +629,6 @@ class AnaforaProjectManager:
                     re.search(AnaforaProjectManager.annotatorRE, term)
                     for term in fileList
                 ]
-                if annotatorMatcher != None
+                if annotatorMatcher is not None
             ]
         )

@@ -1,4 +1,4 @@
-from ..anaforaAuthMiddleware import *
+from ..anaforaAuthMiddleware import AnaforaAuthMiddleware
 
 
 class TestAnaforaAuthMiddleware(AnaforaAuthMiddleware):

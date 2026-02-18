@@ -122,7 +122,7 @@ class ProjectSetting(object):
         if schemaFileIdx >= len(mode.schemaFile):
             raise Exception(
                 "The schema '%s' " % (schemaName)
-                + ("" if modeName == None else "with mode name '%s' " % modeName)
+                + ("" if modeName is None else "with mode name '%s' " % modeName)
                 + "of file index "
                 + str(schemaFileIdx)
                 + " is more than the size of schema files"
@@ -155,12 +155,8 @@ class ProjectSetting(object):
         """
         try:
             return self.schemaList[schemaName]
-        except KeyError:
-            raise Exception("Get schema '%s' error" % schemaName)
-        except:
-            raise
-
-        return schema
+        except Exception:
+            raise Exception(f"Get schema '{schemaName}' error")
 
     def getSchemaMap(self):
         """generate the schema map dict
@@ -213,7 +209,7 @@ class Schema(object):
                 mode = Mode.parseFromXMLDOM(childNode, name)
                 modesList.append((mode.name, mode))
             elif childNode.tagName == "file":
-                if mode == None:
+                if mode is None:
                     mode = Mode(None, name, False, None, [])
 
                 mode.addSchemaFile(childNode.childNodes[0].nodeValue)
@@ -222,7 +218,7 @@ class Schema(object):
 
         modesDict = None
 
-        if mode.name == None:
+        if mode.name is None:
             if len(modesList) > 0:
                 raise Exception(
                     "default mode and multiple modes are exist at the same time: "
@@ -240,7 +236,7 @@ class Schema(object):
         @rtype:	 Mode
         """
         if modeName not in self.modes:
-            if modeName == None:
+            if modeName is None:
                 raise Exception("Get schema '%s' error" % self.name)
             else:
                 raise Exception(
@@ -279,7 +275,7 @@ class Mode(object):
         """
         @rtype: str
         """
-        if self.name == None:
+        if self.name is None:
             return self.schema
 
         return "%s-%s" % (self.schema, self.name)

@@ -12,12 +12,12 @@ class AnaforaAuthMiddleware(object):
 
         request.META["REMOTE_ADMIN"] = False
         if settings.ANAFORA_AUTH_LDAP:
-            if AnaforaAuthMiddleware.grpID == None:
+            if AnaforaAuthMiddleware.grpID is None:
                 try:
                     AnaforaAuthMiddleware.grpID = grp.getgrnam(
                         settings.ADMIN_GROUPNAME
                     )[2]
-                except:
+                except Exception:
                     raise Exception("The setting of 'ADMIN_GROUPNAME' is incorrect")
             if AnaforaAuthMiddleware.grpID in [
                 g.gr_gid
@@ -28,7 +28,7 @@ class AnaforaAuthMiddleware(object):
         else:
             try:
                 groupFile = settings.GROUP_FILE
-                if AnaforaAuthMiddleware.groupList == None:
+                if AnaforaAuthMiddleware.groupList is None:
                     with open(groupFile) as fhd:
                         for line in fhd.readlines():
                             term = line.split(":")
@@ -39,11 +39,11 @@ class AnaforaAuthMiddleware(object):
                                     if t.strip() != ""
                                 ]
                                 break
-            except:
+            except Exception:
                 raise Exception(f"Error parsing groupFile {groupFile}")
 
             if (
-                AnaforaAuthMiddleware.groupList != None
+                AnaforaAuthMiddleware.groupList is not None
                 and request.META["REMOTE_USER"] in AnaforaAuthMiddleware.groupList
             ):
                 request.META["REMOTE_ADMIN"] = True
