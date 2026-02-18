@@ -256,7 +256,11 @@ class AnaforaProjectManagerTest(TestCase):
             "Temporal",
         )
         taskList0 = AnaforaProjectManager.searchAllTask(
-            self.ps, "Temporal", "ColonCancer", "Temporal", modeName="Entity"
+            self.ps,
+            projectName="Temporal",
+            corpusName="ColonCancer",
+            schemaName="Temporal",
+            schemaMode="Entity",
         )
         self.assertListEqual(
             taskList0,

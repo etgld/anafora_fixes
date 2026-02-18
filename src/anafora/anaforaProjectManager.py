@@ -140,7 +140,15 @@ class AnaforaProjectManager:
             % (corpusPath, mode.getSchemaName(), "-Adjudication" if isAdj else "")
         )
         taskNameList = check_output(command_str, shell=True)
-        taskName = [tName for tName in taskNameList.split("\n") if tName != ""]
+
+        def decode(b: bytes) -> str:
+            return b.decode(encoding="utf-8")
+
+        taskName = [
+            tName
+            for tName in map(decode, taskNameList.split(b"\n"))
+            if tName != "" and tName[0] != "."
+        ]
         return taskName
 
     @staticmethod
@@ -162,9 +170,12 @@ class AnaforaProjectManager:
         taskNameList = check_output(command_str, shell=True)
 
         # "find " + AnaforaProjectManager.rootPath + projectName + "/" + corpusName + "/ -type f -name '*." + schemaName + ".*.xml' | sed 's#\(.*\)/\(.*\)/\(.*\)/.*#\\3#' | sort -u", shell=True )
+        def decode(b: bytes) -> str:
+            return b.decode(encoding="utf-8")
+
         taskName = [
             tName
-            for tName in taskNameList.split("\n")
+            for tName in map(decode, taskNameList.split(b"\n"))
             if tName != "" and tName[0] != "."
         ]
 

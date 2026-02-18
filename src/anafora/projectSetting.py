@@ -217,7 +217,7 @@ class Schema(object):
                 raise Exception("unhandle tag: " + childNode.tagName)
 
         modesDict = None
-
+        assert mode is not None, "mode is still None"
         if mode.name is None:
             if len(modesList) > 0:
                 raise Exception(
